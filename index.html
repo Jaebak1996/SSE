@@ -110,12 +110,28 @@
 
         /* ---------- Teaser ---------- */
         .teaser { margin-bottom: 36px; }
-        .teaser video, .teaser img {
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 16px;
+        }
+        .compare-grid .col-head {
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.0em;
+            padding: 6px 0;
+            border-radius: 6px;
+        }
+        .compare-grid .col-head.fail { color: var(--failure); background: #fdecee; }
+        .compare-grid .col-head.ok   { color: var(--success); background: #e8f5ec; }
+        .compare-grid figure { margin: 0; }
+        .compare-grid video {
             width: 100%;
-            border-radius: 10px;
             display: block;
+            border-radius: 8px;
             background: #000;
         }
+        .compare-grid figcaption { text-align: center; margin-top: 6px; }
         .tldr {
             background: var(--accent-soft);
             border-left: 4px solid var(--accent);
@@ -228,21 +244,6 @@
         td.fail { color: var(--failure); }
         .table-note { font-size: 0.88em; color: var(--muted); }
 
-        /* Video gallery */
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-        }
-        .video-grid figure { margin: 0; }
-        .video-grid video {
-            width: 100%;
-            border-radius: 8px;
-            display: block;
-            background: #000;
-        }
-        .video-grid figcaption { text-align: center; }
-
         /* Code / BibTeX */
         code {
             background-color: #f4f4f4;
@@ -286,7 +287,7 @@
         @media (max-width: 760px) {
             h1 { font-size: 1.9em; }
             .subtitle { font-size: 1.1em; }
-            .two-col, .cards, .video-grid { grid-template-columns: 1fr; }
+            .two-col, .cards { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -319,13 +320,37 @@
 
     <!-- ================= Teaser ================= -->
     <div class="teaser">
-        <!--
-            Put your demo video at static/videos/sse_teaser.mp4
-            (H.264, muted, ideally < 10 MB).
-        -->
-        <video autoplay muted loop playsinline preload="metadata">
-            <source src="static/videos/sse_teaser.mp4" type="video/mp4">
-        </video>
+        <!-- Rows: environments. Left column: failure, right column: success. -->
+        <div class="compare-grid">
+            <div class="col-head fail">✗ Failure</div>
+            <div class="col-head ok">✓ Success</div>
+
+            <figure>
+                <video autoplay muted loop playsinline preload="auto">
+                    <source src="static/videos/doublebottleneck_fail_modi.mp4" type="video/mp4">
+                </video>
+                <figcaption>AntMazeDoubleBottleneck</figcaption>
+            </figure>
+            <figure>
+                <video autoplay muted loop playsinline preload="auto">
+                    <source src="static/videos/doublebottleneck_success_modi.mp4" type="video/mp4">
+                </video>
+                <figcaption>AntMazeDoubleBottleneck</figcaption>
+            </figure>
+
+            <figure>
+                <video autoplay muted loop playsinline preload="auto">
+                    <source src="static/videos/keychest_fail_modi.mp4" type="video/mp4">
+                </video>
+                <figcaption>AntKeyChest</figcaption>
+            </figure>
+            <figure>
+                <video autoplay muted loop playsinline preload="auto">
+                    <source src="static/videos/keychest_success_modi.mp4" type="video/mp4">
+                </video>
+                <figcaption>AntKeyChest</figcaption>
+            </figure>
+        </div>
         <div class="tldr">
             <b>TL;DR</b> &nbsp;Instead of relabeling failed subgoals as successes (HER), SSE gives the high-level policy
             a positive return <i>only</i> when the low-level policy actually reaches the chosen subgoal.
@@ -600,31 +625,6 @@
         </tbody>
     </table>
     <p class="table-note">BEAG and NGTE are the only baselines that succeed in at least one fixed-goal setting.</p>
-
-    <!-- ================= Videos (optional gallery) ================= -->
-    <!--
-    <div class="section-title">Videos</div>
-    <div class="video-grid">
-        <figure>
-            <video autoplay muted loop playsinline preload="metadata">
-                <source src="static/videos/antmaze_bottleneck.mp4" type="video/mp4">
-            </video>
-            <figcaption>AntMazeBottleneck</figcaption>
-        </figure>
-        <figure>
-            <video autoplay muted loop playsinline preload="metadata">
-                <source src="static/videos/ant_double_keychest.mp4" type="video/mp4">
-            </video>
-            <figcaption>AntDoubleKeyChest</figcaption>
-        </figure>
-        <figure>
-            <video autoplay muted loop playsinline preload="metadata">
-                <source src="static/videos/reacher_wall_doublegoal.mp4" type="video/mp4">
-            </video>
-            <figcaption>ReacherWallDoubleGoal</figcaption>
-        </figure>
-    </div>
-    -->
 
     <!-- ================= Citation ================= -->
     <div class="section-title" id="bibtex">Citation</div>

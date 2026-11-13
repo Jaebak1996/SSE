@@ -3,41 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strict Subgoal Execution (SSE)</title>
+    <title>Strict Subgoal Execution (SSE) — ICLR 2026</title>
+    <meta name="description" content="Strict Subgoal Execution: Reliable Long-Horizon Planning in Hierarchical Reinforcement Learning (ICLR 2026).">
+
+    <!-- Open Graph (link preview on Slack / X / KakaoTalk etc.) -->
+    <meta property="og:title" content="Strict Subgoal Execution (SSE) — ICLR 2026">
+    <meta property="og:description" content="A graph-based HRL framework that enforces strict subgoal completion with Frontier Experience Replay.">
+    <meta property="og:image" content="https://jaebak1996.github.io/SSE/static/images/fig4_framework.png">
+    <meta property="og:url" content="https://jaebak1996.github.io/SSE/">
+
+    <!-- MathJax for inline math -->
+    <script>
+        window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
     <style>
+        :root {
+            --text: #2b2b2b;
+            --muted: #5f6368;
+            --accent: #1f6feb;
+            --accent-soft: #eaf2ff;
+            --border: #e6e6e6;
+            --bg-soft: #f8f9fa;
+            --success: #1a7f37;
+            --failure: #cf222e;
+            --partial: #9a6700;
+        }
+        * { box-sizing: border-box; }
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            color: #333;
-            line-height: 1.6;
+            color: var(--text);
+            line-height: 1.65;
             margin: 0;
             padding: 0;
             background-color: #fff;
         }
         .container {
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 50px 20px;
+            padding: 56px 20px 80px;
+        }
+
+        /* ---------- Header ---------- */
+        .venue {
+            text-align: center;
+            font-size: 0.95em;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 10px;
         }
         h1 {
             text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 20px;
+            font-size: 2.6em;
+            line-height: 1.2;
+            margin: 0 0 8px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 1.3em;
+            color: var(--muted);
+            margin: 0 0 28px;
         }
         .authors {
             text-align: center;
-            font-size: 1.2em;
-            margin-bottom: 10px;
+            font-size: 1.15em;
+            margin-bottom: 6px;
         }
         .authors a {
-            color: #007bff;
+            color: var(--accent);
             text-decoration: none;
-            margin: 0 5px;
+            margin: 0 6px;
+            white-space: nowrap;
         }
+        .authors a:hover { text-decoration: underline; }
         .affiliations {
             text-align: center;
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 30px;
+            font-size: 1.02em;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .corresponding {
+            text-align: center;
+            font-size: 0.88em;
+            color: var(--muted);
+            margin-bottom: 28px;
         }
         .links {
             text-align: center;
@@ -47,123 +99,561 @@
             display: inline-block;
             background-color: #363636;
             color: #fff;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 10px 22px;
+            border-radius: 22px;
             text-decoration: none;
-            margin: 0 10px;
-            font-size: 0.9em;
+            margin: 6px 6px;
+            font-size: 0.92em;
             transition: background-color 0.2s;
         }
-        .links a:hover {
-            background-color: #555;
+        .links a:hover { background-color: #555; }
+
+        /* ---------- Teaser ---------- */
+        .teaser { margin-bottom: 36px; }
+        .teaser video, .teaser img {
+            width: 100%;
+            border-radius: 10px;
+            display: block;
+            background: #000;
         }
+        .tldr {
+            background: var(--accent-soft);
+            border-left: 4px solid var(--accent);
+            padding: 16px 22px;
+            border-radius: 6px;
+            margin: 18px 0 0;
+            font-size: 1.05em;
+        }
+
+        /* ---------- Sections ---------- */
         .section-title {
-            font-size: 1.5em;
+            font-size: 1.55em;
             font-weight: bold;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
-            margin-top: 40px;
+            margin-top: 52px;
             margin-bottom: 20px;
         }
+        .subsection-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 32px 0 10px;
+        }
         .abstract {
-            background-color: #f8f9fa;
-            padding: 25px;
+            background-color: var(--bg-soft);
+            padding: 25px 28px;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .content-box {
-            margin-bottom: 30px;
-        }
-        .image-placeholder {
+        .abstract p { margin: 0; text-align: justify; }
+
+        figure { margin: 24px 0 8px; }
+        figure img {
             width: 100%;
-            height: 300px;
-            background-color: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-            border-radius: 10px;
-            margin-bottom: 15px;
+            display: block;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
         }
+        figure.narrow img { max-width: 620px; margin: 0 auto; }
+        figcaption {
+            font-size: 0.92em;
+            color: var(--muted);
+            margin-top: 10px;
+            text-align: justify;
+        }
+        figcaption b { color: var(--text); }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* Contribution cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 10px;
+        }
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            background: #fff;
+        }
+        .card h3 {
+            margin: 0 0 8px;
+            font-size: 1.05em;
+        }
+        .card p { margin: 0; font-size: 0.95em; color: #444; }
+
+        /* FER transition types */
+        .fer-list { list-style: none; padding: 0; margin: 16px 0; }
+        .fer-list li {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: var(--bg-soft);
+            border-left: 4px solid #999;
+        }
+        .fer-list li.success { border-left-color: var(--success); }
+        .fer-list li.failure { border-left-color: var(--failure); }
+        .fer-list li.partial { border-left-color: var(--partial); }
+        .fer-list .tag {
+            font-weight: bold;
+            margin-right: 6px;
+        }
+        .fer-list li.success .tag { color: var(--success); }
+        .fer-list li.failure .tag { color: var(--failure); }
+        .fer-list li.partial .tag { color: var(--partial); }
+
+        /* Tables */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 16px 0 6px;
+            font-size: 0.95em;
+        }
+        th, td {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 12px;
+            text-align: center;
+        }
+        th { background: var(--bg-soft); font-weight: 600; }
+        td:first-child, th:first-child { text-align: left; }
+        td.best { font-weight: bold; color: var(--accent); }
+        td.fail { color: var(--failure); }
+        .table-note { font-size: 0.88em; color: var(--muted); }
+
+        /* Video gallery */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .video-grid figure { margin: 0; }
+        .video-grid video {
+            width: 100%;
+            border-radius: 8px;
+            display: block;
+            background: #000;
+        }
+        .video-grid figcaption { text-align: center; }
+
+        /* Code / BibTeX */
         code {
             background-color: #f4f4f4;
             padding: 2px 5px;
             border-radius: 3px;
-            font-family: monospace;
+            font-family: SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.92em;
         }
+        .bibtex-wrap { position: relative; }
         pre {
             background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 5px;
+            padding: 18px;
+            border-radius: 6px;
             overflow-x: auto;
-            font-family: monospace;
+            font-family: SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.88em;
+            line-height: 1.5;
+        }
+        pre code { background: none; padding: 0; }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: 1px solid #ccc;
+            background: #fff;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 0.82em;
+            cursor: pointer;
+        }
+        .copy-btn:hover { background: #f0f0f0; }
+
+        .footer {
+            text-align: center;
+            font-size: 0.85em;
+            color: var(--muted);
+            margin-top: 60px;
+        }
+        .footer a { color: var(--muted); }
+
+        @media (max-width: 760px) {
+            h1 { font-size: 1.9em; }
+            .subtitle { font-size: 1.1em; }
+            .two-col, .cards, .video-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+
+    <!-- ================= Header ================= -->
+    <div class="venue">ICLR 2026</div>
     <h1>Strict Subgoal Execution</h1>
-    
+    <p class="subtitle">Reliable Long-Horizon Planning in Hierarchical Reinforcement Learning</p>
+
     <div class="authors">
-        <a href="#">Jaebak Hwang</a><sup>1</sup>, 
-        <a href="#">Sang-hyeon Lee</a><sup>1</sup>, 
-        <a href="#">Sang-jun Bae</a><sup>1</sup>, 
-        <a href="#">Yong-hyeon Jo</a><sup>1</sup>, 
-        <a href="#">Yi-sak Park</a><sup>1</sup>, 
-        <a href="#">Seungyul Han</a><sup>1</sup>
+        <a href="#">Jaebak Hwang</a>,
+        <a href="#">Sanghyeon Lee</a>,
+        <a href="#">Jeongmo Kim</a>,
+        <a href="#">Seungyul Han</a><sup>*</sup>
     </div>
-    
     <div class="affiliations">
-        <sup>1</sup>AI Graduate School, UNIST
+        Graduate School of Artificial Intelligence, UNIST
     </div>
-    
+    <div class="corresponding"><sup>*</sup>Corresponding author</div>
+
     <div class="links">
         <a href="https://openreview.net/forum?id=cMpOvMuyYa">📄 Paper</a>
         <a href="https://arxiv.org/abs/2506.21039">🎓 arXiv</a>
-        <a href="https://github.com/Jaebak1996/SSE/tree/main">💻 Code (GitHub)</a>
+        <a href="https://github.com/Jaebak1996/SSE/tree/main">💻 Code</a>
+        <a href="#bibtex">📑 BibTeX</a>
     </div>
 
+    <!-- ================= Teaser ================= -->
+    <div class="teaser">
+        <!--
+            Put your demo video at static/videos/sse_teaser.mp4
+            (H.264, muted, ideally < 10 MB).
+        -->
+        <video autoplay muted loop playsinline preload="metadata">
+            <source src="static/videos/sse_teaser.mp4" type="video/mp4">
+        </video>
+        <div class="tldr">
+            <b>TL;DR</b> &nbsp;Instead of relabeling failed subgoals as successes (HER), SSE gives the high-level policy
+            a positive return <i>only</i> when the low-level policy actually reaches the chosen subgoal.
+            Combined with Frontier Experience Replay, a decoupled exploration policy, and failure-aware path refinement,
+            the agent learns to reach distant subgoals in a single high-level step and solves long-horizon,
+            multi-objective tasks with only a few high-level decisions.
+        </div>
+    </div>
+
+    <!-- ================= Abstract ================= -->
     <div class="abstract">
         <div class="section-title" style="margin-top: 0;">Abstract</div>
         <p>
-            In certain complex environments, learning tends to be unstable, so to mitigate this issue, we propose Strict Subgoal Execution (SSE). 
-            SSE is a graph-based Hierarchical Reinforcement Learning framework. 
-            Currently, there are few studies addressing this specific challenge, but SSE provides a stable approach by combining Goal-Conditioned Reinforcement Learning with structured subgoal planning.
+            Long-horizon goal-conditioned tasks pose fundamental challenges for reinforcement learning (RL),
+            particularly when goals are distant and rewards are sparse. While hierarchical and graph-based methods
+            offer partial solutions, their reliance on conventional hindsight relabeling often fails to correct
+            subgoal infeasibility, leading to inefficient high-level planning. To address this, we propose
+            <b>Strict Subgoal Execution (SSE)</b>, a graph-based hierarchical RL framework that integrates
+            <b>Frontier Experience Replay (FER)</b> to separate unreachable from admissible subgoals and streamline
+            high-level decision making. FER delineates the reachability frontier using failure and partial-success
+            transitions, which identifies unreliable subgoals, increases subgoal reliability, and reduces unnecessary
+            high-level decisions. Additionally, SSE employs a decoupled exploration policy to cover under-explored
+            regions of the goal space and a path refinement that adjusts edge costs using observed low-level failures.
+            Experimental results across diverse long-horizon benchmarks show that SSE consistently outperforms
+            existing goal-conditioned and hierarchical RL methods in both efficiency and success rate.
         </p>
     </div>
-<!-- 
-    <div class="content-box">
-        <div class="section-title">Method</div>
-        <div class="image-placeholder">
-            [Method Architecture Image or Video goes here]
-        </div>
-        <p>
-            Briefly describe the core concept of SSE here. Explain how the high-level policy generates subgoals and how the low-level policy executes them within the framework.
-        </p>
-    </div> -->
-<!-- 
-    <div class="content-box">
-        <div class="section-title">Results</div>
-        <div class="image-placeholder">
-            [Results Chart or Environment Rendering goes here]
-        </div>
-        <p>
-            Summarize the experimental results. Mention the performance improvements and how the agent successfully reaches the goals compared to baselines.
-        </p>
-    </div> -->
 
-    <div class="content-box">
-        <div class="section-title">Citation</div>
-        <pre><code>@inproceedings{hwang2026sse,
-  title={Strict Subgoal Execution},
-  author={Hwang, Jaebak and Lee, Sang-hyeon and Bae, Sang-jun and Jo, Yong-hyeon and Park, Yi-sak and Han, Seungyul},
+    <!-- ================= Motivation ================= -->
+    <div class="section-title">Motivation: Why Hindsight Relabeling Hurts the High Level</div>
+    <p>
+        Graph-based HRL methods usually apply hindsight relabeling (HER) at both levels. At the low level this is
+        helpful, but at the high level it creates a problem: when the chosen subgoal is unreachable
+        (limited skill, an obstacle, or excessive distance), every state visited on the failed trajectory is
+        treated as if it had been the intended subgoal. The high-level policy therefore keeps selecting
+        ineffective subgoals, the same subgoal produces widely varying transitions, and high-level trajectories
+        become long. Even when the final goal is reached, credit is spread over too many decisions for earlier
+        choices to be reinforced.
+    </p>
+    <figure>
+        <img src="static/images/fig1_motivation.png" alt="Agent trajectories in goal space under HER vs. SSE">
+        <figcaption>
+            <b>Agent trajectories in the goal space.</b>
+            (a) Conventional HRL with HER relabels intermediate states as subgoals without requiring exact subgoal
+            completion, which lengthens high-level trajectories.
+            (b) SSE with FER requires exact subgoal completion, so each reached state stays aligned with the chosen
+            subgoal and unnecessary high-level decisions disappear.
+            (c) After training, SSE reaches the final goal with very few high-level steps — here a single step,
+            even from a distant start.
+        </figcaption>
+    </figure>
+
+    <!-- ================= Contributions ================= -->
+    <div class="section-title">Key Ideas</div>
+    <div class="cards">
+        <div class="card">
+            <h3>🎯 Frontier Experience Replay</h3>
+            <p>
+                The high level is rewarded only for subgoals that are actually reached. Failure and
+                partial-success transitions mark where execution breaks down and how far it got, separating
+                reachable from unreachable subgoals.
+            </p>
+        </div>
+        <div class="card">
+            <h3>🧭 Decoupled Exploration</h3>
+            <p>
+                Strict execution makes the agent avoid regions where it has failed. A separate exploration policy
+                targets under-visited regions of the goal space to keep coverage high.
+            </p>
+        </div>
+        <div class="card">
+            <h3>🛣️ Failure-Aware Path Refinement</h3>
+            <p>
+                Graph edge costs are increased toward nodes where the low-level policy often fails, so Dijkstra
+                planning prefers safer detours while still passing through unavoidable bottlenecks.
+            </p>
+        </div>
+    </div>
+
+    <!-- ================= Method ================= -->
+    <div class="section-title">Method</div>
+
+    <figure class="narrow">
+        <img src="static/images/fig4_framework.png" alt="Overview of the SSE framework">
+        <figcaption>
+            <b>Overview of SSE.</b> The high-level policy \(\pi^h\) or the exploration policy \(\pi^{exp}\) selects
+            a subgoal \(\tilde g_t\). A waypoint path \((wp_1,\dots,wp_n)\) is planned on the landmark graph with
+            refined edge costs \(\tilde d\), and the low-level policy \(\pi^l\) follows it. Each high-level outcome is
+            stored in the FER buffer \(\mathcal{B}^h_F\) as a success, stop-on-failure, or partial-success transition.
+        </figcaption>
+    </figure>
+
+    <div class="subsection-title">Strict subgoal execution with Frontier Experience Replay</div>
+    <p>
+        Every high-level step, a subgoal \(\tilde g_t\) is chosen and the low-level policy follows a waypoint path on
+        the graph until it terminates at time \(t'\). The subgoal counts as reached if
+        \(\|\phi(s_{t'}) - \tilde g_t\| &lt; \lambda\). FER stores the outcome as one of three transition types:
+    </p>
+    <ul class="fer-list">
+        <li class="success">
+            <span class="tag">Success</span>
+            The subgoal was reached. The transition records the full cumulative reward up to \(t'\), and the
+            episode continues with a new high-level decision.
+        </li>
+        <li class="failure">
+            <span class="tag">Stop-on-failure</span>
+            The subgoal was not reached. The transition gets zero return and its next state is the terminal state,
+            so the episode ends and all future return is lost. This directly discourages the high-level policy from
+            choosing unreachable or unreliable subgoals.
+        </li>
+        <li class="partial">
+            <span class="tag">Partial success</span>
+            On failure, if some waypoint was reliably reached before breaking down, an additional transition is
+            stored with that last reached waypoint as the subgoal, crediting only the part of the path that was
+            actually executed.
+        </li>
+    </ul>
+    <p>
+        Together these transitions trace the <i>reachability frontier</i> — the boundary between subgoals the
+        low-level policy can and cannot reach — and give the high-level critic consistent targets.
+        Unlike HER, FER never turns a failed attempt into a synthetic success.
+    </p>
+
+    <div class="subsection-title">Decoupled exploration for goal-space coverage</div>
+    <p>
+        Ending the episode on failure makes the agent conservative. To counter this, the high-level
+        controller is split into two policies:
+    </p>
+    <ul>
+        <li>
+            <b>High-level policy \(\pi^h\)</b> (ε-greedy): picks the subgoal that maximizes \(Q^h\), or a
+            uniformly random point of the goal space, so it can target any location regardless of the
+            agent's position.
+        </li>
+        <li>
+            <b>Exploration policy \(\pi^{exp}\)</b>: picks the final goal, the greedy subgoal, or a subgoal
+            from a <i>novel region</i> with equal probability. Novel regions are found either by visitation
+            counts on a grid (<b>SSE (Grid)</b>) or by RND-style prediction error (<b>SSE (Model)</b>),
+            the latter intended for higher-dimensional goal spaces.
+        </li>
+    </ul>
+    <p>
+        Exploration dominates early in training and is gradually mixed with \(\pi^h\) at ratio
+        \(\eta : (1-\eta)\).
+    </p>
+    <figure>
+    <img src="static/images/fig2_exploration.png" alt="Subgoals and trajectories during training in U-maze">
+    <figcaption>
+        <b>Initial subgoals in U-maze</b> at early (10K), intermediate (150K) and final (500K) training
+        steps. Grid shading shows visitation counts. Coverage grows over time, unreachable areas drop out of
+        the subgoal candidates, and by the end the Ant reaches the goal in one high-level step.
+    </figcaption>
+</figure>
+
+    <div class="subsection-title">Failure-aware path refinement</div>
+    <div class="two-col">
+        <div>
+            <p>
+                Because every subgoal must be reached within a single high-level step, the waypoint path has to be
+                reliable. The standard edge cost ignores collisions and getting stuck, so the shortest path often
+                runs right along walls where the agent fails.
+            </p>
+            <p>
+                SSE multiplies the cost of each edge \(v_1 \to v_2\) by \(\max(1,\, c_d \cdot \rho_f(v_2))\),
+                where \(\rho_f(v_2)\) is the failure ratio of the target node — measured per grid cell in
+                SSE (Grid), or predicted by a learned failure classifier in SSE (Model). Refinement is switched on
+                only after enough successful visits, so the low-level policy is competent first.
+            </p>
+        </div>
+        <figure style="margin-top: 0;">
+            <img src="static/images/fig3_path_refinement.png" alt="Path refinement in a bottleneck map">
+            <figcaption>
+                <b>Bottleneck map.</b> (a) Without refinement, the agent keeps taking the shortest path through a
+                narrow corridor next to the wall and fails. (b) With refinement, high-failure cells (red) become
+                expensive and the planner takes a safer detour; where no alternative exists, the agent still passes
+                through the bottleneck.
+            </figcaption>
+        </figure>
+    </div>
+
+    <!-- ================= Experiments ================= -->
+    <div class="section-title">Environments</div>
+    <p>
+        We evaluate on 9 long-horizon tasks with fixed goals: 5 AntMaze layouts ranging from a simple U-maze to maps
+        with narrow corridors, 2 KeyChest tasks in which the Ant must collect one or two keys before reaching the
+        goal (the keys are <i>not</i> given as goals), and 2 Reacher tasks in which a 3D arm must get around walls to
+        reach one or two goals. The KeyChest and DoubleGoal tasks require intermediate objectives, which makes them
+        a direct test of high-level planning.
+    </p>
+    <figure>
+        <img src="static/images/fig5_environments.png" alt="The nine evaluation environments">
+        <figcaption><b>Evaluation environments:</b> 5 AntMaze, 2 KeyChest, and 2 Reacher tasks.</figcaption>
+    </figure>
+
+    <div class="section-title">Results</div>
+    <p>
+        We compare against conventional HRL (HIRO, HRAC), graph-based HRL (HIGL, DHRL, NGTE), and graph-based
+        methods without an explicit high-level policy (PIG, BEAG). Baselines use the authors' implementations.
+        Both SSE variants match or exceed the best baseline on every task, and they are the only methods that
+        solve AntKeyChest, AntDoubleKeyChest, and ReacherWallDoubleGoal. In simple mazes, strong baselines such as
+        BEAG and NGTE also learn, but SSE converges faster. In bottleneck maps, path refinement lets SSE avoid
+        unstable regions. On KeyChest and ReacherWallDoubleGoal, which need intermediate objectives, most baselines
+        fail entirely: conventional HRL suffers from long high-level horizons, and goal-centric methods such as BEAG
+        cannot reason about intermediate targets.
+    </p>
+    <figure>
+        <img src="static/images/fig6_results.png" alt="Success rate curves on the nine environments">
+        <figcaption>
+            <b>Success rate on the 9 tasks</b> (mean over 5 seeds, shaded area: standard deviation).
+            SSE (Grid) converges faster thanks to lower overhead; SSE (Model) is designed to scale to
+            high-dimensional goal spaces where grids are infeasible.
+        </figcaption>
+    </figure>
+
+    <div class="subsection-title">Solving a multi-key task with three high-level decisions</div>
+    <p>
+        In AntDoubleKeyChest the agent first expands its coverage, then learns to reach the first key in one
+        high-level step, both keys in two, and finally the whole task — two keys and the goal — in three.
+        No curriculum is used: the reliable high-level policy learned through FER, together with key-possession
+        flags in the state, is enough for the agent to discover the order of sub-objectives on its own.
+    </p>
+    <figure>
+        <img src="static/images/fig7_keychest.png" alt="Trajectory analysis in AntDoubleKeyChest">
+        <figcaption>
+            <b>Greedy subgoals and trajectories in AntDoubleKeyChest.</b>
+            (a) early stage (~300K steps), (b) the first key is reached (~1M), (c) both keys are collected (~1.5M),
+            (d) the goal is reached after both keys (~3M).
+        </figcaption>
+    </figure>
+
+    <div class="subsection-title">Ablation study</div>
+    <p>
+        Removing any component lowers performance on AntDoubleKeyChest. Replacing strict subgoal execution with a
+        HER-based high level, or replacing FER with a standard replay buffer, prevents learning entirely — the
+        clearest evidence that strict execution is the core of the method. Replacing grid landmarks with farthest
+        point sampling still solves the task, only less efficiently, so the framework does not depend on a
+        particular landmark scheme. Performance is stable across a wide range of the path-refinement scale, grid
+        size, and exploration ratio.
+    </p>
+    <figure>
+        <img src="static/images/fig8_ablation.png" alt="Ablation study on AntDoubleKeyChest">
+        <figcaption>
+            <b>Ablations on AntDoubleKeyChest:</b> (a) removing or replacing each component,
+            (b) path-refinement scale \(c_d\), (c) grid cell size \(d_{\mathcal G}\), (d) exploration ratio \(\eta\).
+        </figcaption>
+    </figure>
+
+    <div class="subsection-title">Computational efficiency</div>
+    <p>
+        Ending the episode as soon as a subgoal fails removes long, unproductive rollouts, so SSE is also cheaper
+        per episode than the baselines that can solve these tasks at all. The gap is largest on long-horizon tasks.
+    </p>
+    <table>
+        <thead>
+            <tr><th>Task</th><th>Metric</th><th>SSE</th><th>BEAG</th><th>NGTE</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="2">AntMazeBottleneck</td>
+                <td>Time per episode</td><td class="best">5.94 s</td><td>6.46 s</td><td>12.65 s</td>
+            </tr>
+            <tr>
+                <td>Episodes to 60% success</td><td>432</td><td class="best">425.2</td><td>725.6</td>
+            </tr>
+            <tr>
+                <td rowspan="2">AntKeyChest</td>
+                <td>Time per episode</td><td class="best">18.13 s</td><td>57.29 s</td><td>119.07 s</td>
+            </tr>
+            <tr>
+                <td>Episodes to 60% success</td><td class="best">1658</td><td class="fail">fail</td><td class="fail">fail</td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="table-note">BEAG and NGTE are the only baselines that succeed in at least one fixed-goal setting.</p>
+
+    <!-- ================= Videos (optional gallery) ================= -->
+    <!--
+    <div class="section-title">Videos</div>
+    <div class="video-grid">
+        <figure>
+            <video autoplay muted loop playsinline preload="metadata">
+                <source src="static/videos/antmaze_bottleneck.mp4" type="video/mp4">
+            </video>
+            <figcaption>AntMazeBottleneck</figcaption>
+        </figure>
+        <figure>
+            <video autoplay muted loop playsinline preload="metadata">
+                <source src="static/videos/ant_double_keychest.mp4" type="video/mp4">
+            </video>
+            <figcaption>AntDoubleKeyChest</figcaption>
+        </figure>
+        <figure>
+            <video autoplay muted loop playsinline preload="metadata">
+                <source src="static/videos/reacher_wall_doublegoal.mp4" type="video/mp4">
+            </video>
+            <figcaption>ReacherWallDoubleGoal</figcaption>
+        </figure>
+    </div>
+    -->
+
+    <!-- ================= Citation ================= -->
+    <div class="section-title" id="bibtex">Citation</div>
+    <div class="bibtex-wrap">
+        <button class="copy-btn" onclick="copyBibtex(this)">Copy</button>
+        <pre><code id="bibtex-code">@inproceedings{hwang2026sse,
+  title={Strict Subgoal Execution: Reliable Long-Horizon Planning in Hierarchical Reinforcement Learning},
+  author={Hwang, Jaebak and Lee, Sanghyeon and Kim, Jeongmo and Han, Seungyul},
   booktitle={The Fourteenth International Conference on Learning Representations},
   year={2026},
   url={https://openreview.net/forum?id=cMpOvMuyYa}
 }</code></pre>
     </div>
+
+    <div class="footer">
+        This work was supported in part by IITP and NRF grants funded by the Korea government (MSIT).<br>
+        Page template inspired by academic project pages.
+    </div>
 </div>
+
+<script>
+    function copyBibtex(btn) {
+        const text = document.getElementById('bibtex-code').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+        });
+    }
+</script>
 
 </body>
 </html>
